@@ -159,7 +159,7 @@ const icon = getDistroIcon(data.icon_slug);
 
   // Re-run after View Transitions navigation
   initBars();
-  document.addEventListener('astro:page-load', initBars);
+  document.addEventListener('astro:page-load', initBars, { once: true });
 </script>
 
 <style>

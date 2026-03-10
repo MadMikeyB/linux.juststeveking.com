@@ -96,7 +96,7 @@ const allUseCases = [...new Set(distros.flatMap(d => d.data.use_cases))].sort();
   }
 
   initFilterBar();
-  document.addEventListener('astro:page-load', initFilterBar);
+  document.addEventListener('astro:page-load', initFilterBar, { once: true });
 </script>
 
 <style>

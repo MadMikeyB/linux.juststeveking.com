@@ -563,7 +563,7 @@ const distrosPayload = distros.map(d => ({
   });
 
   // ── Keyboard navigation ───────────────────────────────────────────────────
-  document.addEventListener('keydown', (e: KeyboardEvent) => {
+  const handleWizardKeyboardNav = (e: KeyboardEvent) => {
     // Only when wizard is active
     if (stepsContainer.classList.contains('hidden')) return;
 
@@ -586,7 +586,9 @@ const distrosPayload = distros.map(d => ({
     } else if (e.key === 'Enter' && !btnNext.disabled) {
       btnNext.click();
     }
-  });
+  };
+
+  stepsContainer.addEventListener('keydown', handleWizardKeyboardNav);
 
   // ── Results ───────────────────────────────────────────────────────────────
   const MEDALS = ['🥇', '🥈', '🥉'];

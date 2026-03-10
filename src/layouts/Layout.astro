@@ -82,7 +82,7 @@ const distros = distrosRaw.map(d => ({
         <div class="nav-actions">
           <button class="btn-search" id="search-trigger" aria-label="Search distributions">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span class="search-kbd">⌘K</span>
+            <span class="search-kbd" id="search-kbd">⌘K</span>
           </button>
           <a href="/finder" class="btn btn-primary nav-cta">Find My Distro</a>
         </div>
@@ -136,36 +136,52 @@ const distros = distrosRaw.map(d => ({
     </footer>
 
     <script>
-      const hamburger = document.getElementById('hamburger')!;
-      const menu = document.getElementById('mobile-menu')!;
-      const searchTrigger = document.getElementById('search-trigger');
+      function initHeaderControls() {
+        const hamburger = document.getElementById('hamburger');
+        const menu = document.getElementById('mobile-menu');
+        const searchTrigger = document.getElementById('search-trigger');
+        const searchKbd = document.getElementById('search-kbd');
+        const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
 
-      hamburger.addEventListener('click', () => {
-        const open = hamburger.getAttribute('aria-expanded') === 'true';
-        hamburger.setAttribute('aria-expanded', String(!open));
-        menu.setAttribute('aria-hidden', String(open));
-        hamburger.classList.toggle('open', !open);
-        menu.classList.toggle('open', !open);
-      });
+        if (searchKbd) {
+          searchKbd.textContent = isMac ? '⌘K' : 'Ctrl+K';
+        }
 
-      // Search trigger logic for Svelte component
-      searchTrigger?.addEventListener('click', () => {
-        window.dispatchEvent(new KeyboardEvent('keydown', {
-          key: 'k',
-          metaKey: true,
-          bubbles: true
-        }));
-      });
+        if (!hamburger || !menu || menu.dataset.bound === 'true') return;
 
-      // Close on nav
-      menu.querySelectorAll('a').forEach(a => {
-        a.addEventListener('click', () => {
-          hamburger.setAttribute('aria-expanded', 'false');
-          menu.setAttribute('aria-hidden', 'true');
-          hamburger.classList.remove('open');
-          menu.classList.remove('open');
+        hamburger.addEventListener('click', () => {
+          const open = hamburger.getAttribute('aria-expanded') === 'true';
+          hamburger.setAttribute('aria-expanded', String(!open));
+          menu.setAttribute('aria-hidden', String(open));
+          hamburger.classList.toggle('open', !open);
+          menu.classList.toggle('open', !open);
         });
-      });
+
+        // Search trigger logic for Svelte component
+        searchTrigger?.addEventListener('click', () => {
+          window.dispatchEvent(new KeyboardEvent('keydown', {
+            key: 'k',
+            metaKey: isMac,
+            ctrlKey: !isMac,
+            bubbles: true
+          }));
+        });
+
+        // Close on nav
+        menu.querySelectorAll('a').forEach(a => {
+          a.addEventListener('click', () => {
+            hamburger.setAttribute('aria-expanded', 'false');
+            menu.setAttribute('aria-hidden', 'true');
+            hamburger.classList.remove('open');
+            menu.classList.remove('open');
+          });
+        });
+
+        menu.dataset.bound = 'true';
+      }
+
+      initHeaderControls();
+      document.addEventListener('astro:page-load', initHeaderControls);
     </script>
     <CommandPalette client:load distros={distros} />
   </body>
